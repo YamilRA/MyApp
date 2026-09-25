@@ -53,7 +53,6 @@ namespace MyApp
                 false,
                 Encoding.UTF8))
             {
-                sw.WriteLine("ID,NOMBRE,TELEFONO");
 
                 foreach (Persona persona in personas)
                 {
