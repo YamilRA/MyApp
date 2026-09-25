@@ -14,7 +14,11 @@ namespace MyApp
 {
     public partial class Form1 : Form
     {
+        bool save = false;
+        string path;
+
         List<Persona> personas = new List<Persona>();
+
         public Form1()
         {
             InitializeComponent();
@@ -42,6 +46,24 @@ namespace MyApp
             maskedTextBox1.Clear();
         }
 
+        private void GuardarCSV()
+        {
+            using (StreamWriter sw = new StreamWriter(
+                path,
+                false,
+                Encoding.UTF8))
+            {
+                sw.WriteLine("ID,NOMBRE,TELEFONO");
+
+                foreach (Persona persona in personas)
+                {
+                    sw.WriteLine(
+                        $"{persona.Id},{persona.Nombre},{persona.Telefono}"
+                    );
+                }
+            }
+        }
+
         private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (save == false)
@@ -51,10 +73,13 @@ namespace MyApp
                     path = saveFileDialog1.FileName;
                     save = true;
                 }
-
+                else
+                {
+                    return;
+                }
             }
-            texto.SaveFile(path, RichTextBoxStreamType.PlainText);
-            guardar.Enabled = false;
+
+            GuardarCSV();
         }
 
         private void guardarComoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -62,9 +87,9 @@ namespace MyApp
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 path = saveFileDialog1.FileName;
-                texto.SaveFile(path, RichTextBoxStreamType.PlainText);
-                guardar.Enabled = true;
                 save = true;
+
+                GuardarCSV();
             }
         }
 
