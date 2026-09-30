@@ -54,42 +54,6 @@ namespace MyApp
                 Encoding.UTF8))
             {
 
-                foreach (Persona persona in personas)
-                {
-                    sw.WriteLine(
-                        $"{persona.Id},{persona.Nombre},{persona.Telefono}"
-                    );
-                }
-            }
-        }
-
-        private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (save == false)
-            {
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    path = saveFileDialog1.FileName;
-                    save = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            GuardarCSV();
-        }
-
-        private void guardarComoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                path = saveFileDialog1.FileName;
-                save = true;
-
-                GuardarCSV();
-            }
         }
 
     }
