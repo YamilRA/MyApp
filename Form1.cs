@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
+using CsvHelper;
+using System.Globalization;
 
 namespace MyApp
 {
@@ -16,8 +18,7 @@ namespace MyApp
     {
         bool save = false;
         string path;
-
-        List<Persona> personas = new List<Persona>();
+        List<Persona> registros = new List<Persona>();
 
         public Form1()
         {
@@ -26,34 +27,54 @@ namespace MyApp
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int id = personas.Count + 1;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                path = openFileDialog1.FileName;
 
-            Persona persona = new Persona(
-                id,
-                textBox1.Text,
-                maskedTextBox1.Text
-            );
+                using (var reader = new StreamReader(path))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    registros = csv.GetRecords<Persona>().ToList();
+                }
 
-            personas.Add(persona);
-
-            dataGridView1.Rows.Add(
-                persona.Id,
-                persona.Nombre,
-                persona.Telefono
-            );
-
-            textBox1.Clear();
-            maskedTextBox1.Clear();
+                foreach (var registro in registros)
+                {
+                    dataGridView1.Rows.Add(
+                        registro.id,
+                        registro.name,
+                        registro.email
+                    );
+                }
+                button2.Visible = true;
+            }
         }
 
-        private void GuardarCSV()
-        {
-            using (StreamWriter sw = new StreamWriter(
-                path,
-                false,
-                Encoding.UTF8))
+        private void GuardarCSV(){
+            using (StreamWriter sw = new StreamWriter(path, false))
             {
+                sw.WriteLine("id,name,email");
 
+                foreach (DataGridViewRow fila in dataGridView1.Rows)
+                {
+                    if (!fila.IsNewRow)
+                    {
+                        string[] datos = new string[fila.Cells.Count];
+
+                        for (int i = 0; i < fila.Cells.Count; i++)
+                        {
+                            datos[i] = fila.Cells[i].Value?.ToString() ?? "";
+                        }
+
+                        sw.WriteLine(string.Join(",", datos));
+                    }
+                }
+                dataGridView1.Focus();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            GuardarCSV();
         }
 
     }
