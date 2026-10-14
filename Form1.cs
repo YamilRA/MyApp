@@ -17,5 +17,27 @@ namespace MyApp
             InitializeComponent();
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Datos datos= new Datos();
+
+            bool f = datos.Insertar(textBox1.Text, textBox2.Text, textBox3.Text, 
+                maskedTextBox1.Text, textBox5.Text);
+
+            if (f)
+
+            {
+                MessageBox.Show("Registro agregado correctamente");
+
+                this.Close();
+            } else{
+                MessageBox.Show("Error al agregar el registro");
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

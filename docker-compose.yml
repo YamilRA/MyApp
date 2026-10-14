@@ -5,7 +5,7 @@ services:
         restart: unless-stopped
         environment:
             ACCEPT_EULA: "Y"
-            MSSQL_SA_PASSWORD: "Rojinegra12"
+            MSSQL_SA_PASSWORD: "0000"
             MSSQL_PID: "Developer"
             TZ: "America/Mexico"
         ports:
