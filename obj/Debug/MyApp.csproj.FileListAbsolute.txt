@@ -9,3 +9,4 @@ C:\Users\YamilRA\source\repos\MyApp\MyApp\obj\Debug\MyApp.csproj.GenerateResourc
 C:\Users\YamilRA\source\repos\MyApp\MyApp\obj\Debug\MyApp.csproj.CoreCompileInputs.cache
 C:\Users\YamilRA\source\repos\MyApp\MyApp\obj\Debug\MyApp.exe
 C:\Users\YamilRA\source\repos\MyApp\MyApp\obj\Debug\MyApp.pdb
+C:\Users\YamilRA\source\repos\MyApp\MyApp\obj\Debug\MyApp.Form3.resources
