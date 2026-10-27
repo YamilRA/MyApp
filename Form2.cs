@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace MyApp
 {
     public partial class Form2 : Form
     {
         Datos datos;
+
+        private int filaSeleccionadaIndex = -1;
+        private int columnaSeleccionadaIndex = -1;
         public Form2()
         {
             InitializeComponent();
@@ -25,23 +20,25 @@ namespace MyApp
             datos = new Datos();
             DataSet ds = datos.Informacion("Select * from Datos");
 
-            if (ds != null)
+            if (ds != null && ds.Tables.Count > 0)
             {
                 dataGridView1.AutoGenerateColumns = false;
 
-                dataGridView1.Columns[0].DataPropertyName = "id";
-                dataGridView1.Columns[1].DataPropertyName = "nombre";
-                dataGridView1.Columns[2].DataPropertyName = "apellido_p";
-                dataGridView1.Columns[3].DataPropertyName = "apellido_m";
-                dataGridView1.Columns[4].DataPropertyName = "telefono";
-                dataGridView1.Columns[5].DataPropertyName = "correo";
+                if (dataGridView1.Columns.Count >= 6)
+                {
+                    dataGridView1.Columns[0].DataPropertyName = "id";
+                    dataGridView1.Columns[1].DataPropertyName = "nombre";
+                    dataGridView1.Columns[2].DataPropertyName = "apellido_p";
+                    dataGridView1.Columns[3].DataPropertyName = "apellido_m";
+                    dataGridView1.Columns[4].DataPropertyName = "telefono";
+                    dataGridView1.Columns[5].DataPropertyName = "correo";
+                }
 
                 dataGridView1.DataSource = ds.Tables[0];
-
             }
             else
             {
-                MessageBox.Show("No se pudo obtener la información de la base de datos.", 
+                MessageBox.Show("No se pudo obtener la información de la base de datos.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -49,32 +46,90 @@ namespace MyApp
         {
             ActualizarGrid();
         }
-        
+
         private void button1_Click(object sender, EventArgs e)
         {
             Form1 agregar = new Form1();
-            agregar.Show();
+            agregar.ShowDialog();
+            ActualizarGrid();
         }
         private void Form2_Activated(object sender, EventArgs e)
         {
+            contextMenuStrip1.Enabled = dataGridView1.SelectedRows.Count > 0;
             ActualizarGrid();
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            Form1 actualizar = new Form1(
-                dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString(),
-                dataGridView1.Rows[e.RowIndex].Cells[2].Value.ToString(),
-                dataGridView1.Rows[e.RowIndex].Cells[3].Value.ToString(),
-                dataGridView1.Rows[e.RowIndex].Cells[4].Value.ToString(),
-                dataGridView1.Rows[e.RowIndex].Cells[5].Value.ToString(),
-                Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells[0].Value));
-            actualizar.Show();
+            if (e.RowIndex >= 0)
+            {
+                Form1 actualizar = new Form1(
+                    dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString(),
+                    dataGridView1.Rows[e.RowIndex].Cells[2].Value.ToString(),
+                    dataGridView1.Rows[e.RowIndex].Cells[3].Value.ToString(),
+                    dataGridView1.Rows[e.RowIndex].Cells[4].Value.ToString(),
+                    dataGridView1.Rows[e.RowIndex].Cells[5].Value.ToString(),
+                    Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells[0].Value));
+
+                actualizar.ShowDialog();
+                ActualizarGrid();
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             this.Close();
         }
+
+        private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                dataGridView1.ClearSelection();
+                dataGridView1.CurrentCell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                filaSeleccionadaIndex = e.RowIndex;
+                columnaSeleccionadaIndex = e.ColumnIndex;
+            }
+        }
+
+        private void editarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (filaSeleccionadaIndex >= 0 && columnaSeleccionadaIndex >= 0)
+            {
+                var valorCelda = dataGridView1.Rows[filaSeleccionadaIndex].Cells[columnaSeleccionadaIndex].Value;
+                int idRegistro = Convert.ToInt32(dataGridView1.Rows[filaSeleccionadaIndex].Cells[0].Value);
+
+                Form1 actualizar = new Form1(
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[1].Value.ToString(),
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[2].Value.ToString(),
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[3].Value.ToString(),
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[4].Value.ToString(),
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[5].Value.ToString(),
+                    idRegistro);
+
+                actualizar.ShowDialog();
+                ActualizarGrid();
+            }
+        }
+
+        private void copiarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentCell != null && dataGridView1.CurrentCell.Value != null)
+            {
+                string textoCelda = dataGridView1.CurrentCell.Value.ToString();
+
+                Clipboard.SetText(textoCelda);
+
+                MessageBox.Show("Texto copiado al portapapeles: " + textoCelda,
+                    "Copiado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("La celda seleccionada está vacía.",
+                    "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
     }
 }

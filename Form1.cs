@@ -19,6 +19,7 @@ namespace MyApp
         public Form1()
         {
             InitializeComponent();
+            updateMode = false;
         }
 
         public Form1(string nombre, string paterno, string materno,
@@ -30,7 +31,7 @@ namespace MyApp
             textBox3.Text = materno;
             maskedTextBox1.Text = telefono;
             textBox5.Text = correo;
-            button1.Text = "Actualiza";
+            button1.Text = "Actualizar";
             updateMode = true;
             this.id = id;
         }
@@ -41,8 +42,7 @@ namespace MyApp
             if (updateMode == false)
             {
                 bool f = datos.ejecutar("Insert Into Datos(nombre,apellido_p,apellido_m," +
-                "telefono,correo)Values('"
-                + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text
+                "telefono,correo)Values('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text
                 + "','" + maskedTextBox1.Text + "','" + textBox5.Text + "')");
                 if (f)
                 {
@@ -57,14 +57,14 @@ namespace MyApp
             else
             {
                 SqlCommand comando = new SqlCommand("Update Datos Set nombre=@nombre," +
-                    "paterno=@_p,materno=@apellido_m,telefono=@telefono," +
+                    "apellido_p=@apellido_p,apellido_m=@apellido_m,telefono=@telefono," +
                     "correo=@correo Where id=@id");
+                comando.Parameters.AddWithValue("@id", id);
                 comando.Parameters.AddWithValue("@nombre", textBox1.Text);
                 comando.Parameters.AddWithValue("@apellido_p", textBox2.Text);
                 comando.Parameters.AddWithValue("@apellido_m", textBox3.Text);
                 comando.Parameters.AddWithValue("@telefono", maskedTextBox1.Text);
                 comando.Parameters.AddWithValue("@correo", textBox5.Text);
-                comando.Parameters.AddWithValue("@id", id);
                 bool f = datos.ejecutar(comando);
                 if (f)
                 {
@@ -82,5 +82,6 @@ namespace MyApp
         {
             this.Close();
         }
+
     }
 }
