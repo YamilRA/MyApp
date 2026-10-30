@@ -18,13 +18,28 @@ namespace MyApp
         private void ActualizarGrid()
         {
             datos = new Datos();
-            DataSet ds = datos.Informacion("Select * from Datos");
+
+            string query = @"
+        SELECT 
+            A.id, 
+            A.nombre, 
+            A.apellido_p, 
+            A.apellido_m, 
+            A.telefono, 
+            A.correo, 
+            E.Nombre AS Estado, 
+            M.Nombre AS Municipio 
+        FROM Datos.Alumnos AS A
+        LEFT JOIN Ubicacion.Estados AS E ON A.estado_id = E.id
+        LEFT JOIN Ubicacion.Municipios AS M ON A.municipio_id = M.id";
+
+            DataSet ds = datos.Informacion(query);
 
             if (ds != null && ds.Tables.Count > 0)
             {
                 dataGridView1.AutoGenerateColumns = false;
 
-                if (dataGridView1.Columns.Count >= 6)
+                if (dataGridView1.Columns.Count >= 8)
                 {
                     dataGridView1.Columns[0].DataPropertyName = "id";
                     dataGridView1.Columns[1].DataPropertyName = "nombre";
@@ -32,6 +47,8 @@ namespace MyApp
                     dataGridView1.Columns[3].DataPropertyName = "apellido_m";
                     dataGridView1.Columns[4].DataPropertyName = "telefono";
                     dataGridView1.Columns[5].DataPropertyName = "correo";
+                    dataGridView1.Columns[6].DataPropertyName = "Estado";
+                    dataGridView1.Columns[7].DataPropertyName = "Municipio";
                 }
 
                 dataGridView1.DataSource = ds.Tables[0];
@@ -63,13 +80,21 @@ namespace MyApp
         {
             if (e.RowIndex >= 0)
             {
+                DataRowView filaDatos = (DataRowView)dataGridView1.Rows[e.RowIndex].DataBoundItem;
+
+                int idRegistro = Convert.ToInt32(filaDatos["id"]);
+                int.TryParse(filaDatos["estado_id"]?.ToString(), out int estadoId);
+                int.TryParse(filaDatos["municipio_id"]?.ToString(), out int municipioId);
+
                 Form1 actualizar = new Form1(
-                    dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString(),
-                    dataGridView1.Rows[e.RowIndex].Cells[2].Value.ToString(),
-                    dataGridView1.Rows[e.RowIndex].Cells[3].Value.ToString(),
-                    dataGridView1.Rows[e.RowIndex].Cells[4].Value.ToString(),
-                    dataGridView1.Rows[e.RowIndex].Cells[5].Value.ToString(),
-                    Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells[0].Value));
+                    dataGridView1.Rows[e.RowIndex].Cells[1].Value?.ToString() ?? "",
+                    dataGridView1.Rows[e.RowIndex].Cells[2].Value?.ToString() ?? "",
+                    dataGridView1.Rows[e.RowIndex].Cells[3].Value?.ToString() ?? "",
+                    dataGridView1.Rows[e.RowIndex].Cells[4].Value?.ToString() ?? "",
+                    dataGridView1.Rows[e.RowIndex].Cells[5].Value?.ToString() ?? "",
+                    idRegistro,
+                    estadoId,
+                    municipioId);
 
                 actualizar.ShowDialog();
                 ActualizarGrid();
@@ -97,16 +122,21 @@ namespace MyApp
         {
             if (filaSeleccionadaIndex >= 0 && columnaSeleccionadaIndex >= 0)
             {
-                var valorCelda = dataGridView1.Rows[filaSeleccionadaIndex].Cells[columnaSeleccionadaIndex].Value;
-                int idRegistro = Convert.ToInt32(dataGridView1.Rows[filaSeleccionadaIndex].Cells[0].Value);
+                DataRowView filaDatos = (DataRowView)dataGridView1.Rows[filaSeleccionadaIndex].DataBoundItem;
+
+                int idRegistro = Convert.ToInt32(filaDatos["id"]);
+                int.TryParse(filaDatos["estado_id"]?.ToString(), out int estadoId);
+                int.TryParse(filaDatos["municipio_id"]?.ToString(), out int municipioId);
 
                 Form1 actualizar = new Form1(
-                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[1].Value.ToString(),
-                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[2].Value.ToString(),
-                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[3].Value.ToString(),
-                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[4].Value.ToString(),
-                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[5].Value.ToString(),
-                    idRegistro);
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[1].Value?.ToString() ?? "",
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[2].Value?.ToString() ?? "",
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[3].Value?.ToString() ?? "",
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[4].Value?.ToString() ?? "",
+                    dataGridView1.Rows[filaSeleccionadaIndex].Cells[5].Value?.ToString() ?? "",
+                    idRegistro,
+                    estadoId,
+                    municipioId);
 
                 actualizar.ShowDialog();
                 ActualizarGrid();
